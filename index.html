@@ -27,7 +27,10 @@
     position: fixed;
     inset: 0;
     background: #0a0a0a;
+    touch-action: none;   /* we handle horizontal drag ourselves */
+    cursor: grab;
   }
+  #stage.dragging { cursor: grabbing; }
 
   .slide {
     position: absolute;
@@ -69,6 +72,7 @@
     line-height: 1;
     text-shadow: 0 2px 24px rgba(0,0,0,0.5);
     user-select: none;
+    pointer-events: none;
   }
 
   /* ---- Bottom nav ---- */
@@ -112,12 +116,36 @@
     background: #fff;
     text-shadow: none;
   }
+
+  /* one-time hint on touch devices */
+  #hint {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--nav-height) + 22px);
+    transform: translateX(-50%);
+    z-index: 15;
+    color: #fff;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 19px;
+    letter-spacing: 0.08em;
+    padding: 8px 20px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.35);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #hint.show { opacity: 1; }
 </style>
 </head>
 <body>
   <div id="stage"></div>
   <div id="scrim"></div>
   <div id="yearLabel"></div>
+  <div id="hint">&#8592;&nbsp;&nbsp;swipe to see more&nbsp;&nbsp;&#8594;</div>
   <nav id="nav"></nav>
 
 <script>
@@ -138,13 +166,16 @@
 
   const slides = [];
   const buttons = [];
+  const panX = [];   // remembered horizontal pan (%) per photo
 
   PHOTOS.forEach((p, i) => {
     const slide = document.createElement("div");
     slide.className = "slide";
     slide.style.backgroundImage = `url("${encodeURI(p.src)}")`;
+    slide.style.backgroundPositionX = "50%";
     stage.appendChild(slide);
     slides.push(slide);
+    panX.push(50);
 
     const btn = document.createElement("button");
     btn.className = "year-btn";
@@ -164,6 +195,52 @@
     current = i;
     // keep the selected year comfortably in view within the scroller
     buttons[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+
+  // ---- Drag to pan the photo horizontally (reveals the cropped sides) ----
+  let dragging = false, startX = 0, startPos = 50;
+
+  stage.addEventListener("pointerdown", (e) => {
+    dragging = true;
+    startX = e.clientX;
+    startPos = panX[current];
+    stage.classList.add("dragging");
+    stage.setPointerCapture(e.pointerId);
+    dismissHint();
+  });
+
+  stage.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    // a full screen-width drag sweeps the whole photo, left to right
+    const deltaPct = ((e.clientX - startX) / stage.clientWidth) * 100;
+    const pos = Math.max(0, Math.min(100, startPos - deltaPct));
+    panX[current] = pos;
+    slides[current].style.backgroundPositionX = pos + "%";
+  });
+
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    stage.classList.remove("dragging");
+    if (e.pointerId != null && stage.hasPointerCapture(e.pointerId)) {
+      stage.releasePointerCapture(e.pointerId);
+    }
+  }
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+
+  // ---- One-time swipe hint on touch devices ----
+  const hint = document.getElementById("hint");
+  let hintShown = false;
+  function dismissHint() {
+    if (!hintShown) return;
+    hint.classList.remove("show");
+    hintShown = false;
+  }
+  if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+    hint.classList.add("show");
+    hintShown = true;
+    setTimeout(dismissHint, 4500);
   }
 
   // Arrow keys to move between years
