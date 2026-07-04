@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Padon Reunion</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --nav-height: 88px;
+    --accent: #ffffff;
+  }
+
+  html, body {
+    height: 100%;
+    background: #0a0a0a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ---- Featured photo stage ---- */
+  #stage {
+    position: fixed;
+    inset: 0;
+    background: #0a0a0a;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1;
+  }
+
+  /* subtle gradient so the nav bar stays legible over any photo */
+  #scrim {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 240px;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0));
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* year label, top-left */
+  #yearLabel {
+    position: fixed;
+    top: 28px;
+    left: 32px;
+    z-index: 10;
+    color: #fff;
+    font-size: clamp(40px, 8vw, 88px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+    user-select: none;
+  }
+
+  /* ---- Bottom nav ---- */
+  #nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--nav-height);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 24px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  #nav::-webkit-scrollbar { display: none; }
+
+  .year-btn {
+    flex: 0 0 auto;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: color 0.25s ease, background 0.25s ease;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.6);
+    white-space: nowrap;
+  }
+  .year-btn:hover { color: #fff; }
+  .year-btn.active {
+    color: #0a0a0a;
+    background: #fff;
+    text-shadow: none;
+  }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="scrim"></div>
+  <div id="yearLabel"></div>
+  <nav id="nav"></nav>
+
+<script>
+  // Each entry: the year (label) and its photo file.
+  // Add a new reunion by dropping the photo in this folder and adding a line here.
+  const PHOTOS = [
+    { year: "2025", src: "2025.jpeg" },
+    { year: "2024", src: "2024.jpeg" },
+    { year: "2021", src: "2021.jpg" },
+    { year: "2020", src: "2020.jpg" },
+    { year: "2019", src: "2019.jpg" },
+    { year: "2018", src: "2018.jpg" },
+  ];
+
+  const stage = document.getElementById("stage");
+  const nav = document.getElementById("nav");
+  const yearLabel = document.getElementById("yearLabel");
+
+  const slides = [];
+  const buttons = [];
+
+  PHOTOS.forEach((p, i) => {
+    const slide = document.createElement("div");
+    slide.className = "slide";
+    slide.style.backgroundImage = `url("${encodeURI(p.src)}")`;
+    stage.appendChild(slide);
+    slides.push(slide);
+
+    const btn = document.createElement("button");
+    btn.className = "year-btn";
+    btn.textContent = p.year;
+    btn.addEventListener("click", () => show(i));
+    nav.appendChild(btn);
+    buttons.push(btn);
+  });
+
+  let current = -1;
+
+  function show(i) {
+    if (i === current) return;
+    slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+    buttons.forEach((b, idx) => b.classList.toggle("active", idx === i));
+    yearLabel.textContent = PHOTOS[i].year;
+    current = i;
+    // keep the selected year comfortably in view within the scroller
+    buttons[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+
+  // Arrow keys to move between years
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") show(Math.min(current + 1, PHOTOS.length - 1));
+    if (e.key === "ArrowLeft")  show(Math.max(current - 1, 0));
+  });
+
+  // Start on the most recent reunion (now first in the list)
+  show(0);
+</script>
+</body>
+</html>
