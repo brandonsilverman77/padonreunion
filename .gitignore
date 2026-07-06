@@ -1,2 +1,5 @@
 # Full-resolution photo backups — kept locally, not published to the site
 originals/
+
+# macOS junk
+.DS_Store
