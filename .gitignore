@@ -9,3 +9,6 @@ originals/
 *.mov
 compress.log
 compress_videos.sh
+
+# Whisper model (large, local only)
+.whisper-models/
