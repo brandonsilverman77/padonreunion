@@ -3,3 +3,9 @@ originals/
 
 # macOS junk
 .DS_Store
+
+# Original full-size source videos (huge) — only the compressed videos/ folder is published
+*.MOV
+*.mov
+compress.log
+compress_videos.sh

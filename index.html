@@ -22,7 +22,42 @@
     overflow: hidden;
   }
 
-  /* ---- Featured photo stage ---- */
+  /* =========================================================
+     MODE TOGGLE  (Photos / Videos) — lives on top in both modes
+     ========================================================= */
+  #modeToggle {
+    position: fixed;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(0,0,0,0.38);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+  }
+  .mode-btn {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 22px;
+    border-radius: 999px;
+    transition: color 0.25s ease, background 0.25s ease;
+  }
+  .mode-btn:hover { color: #fff; }
+  .mode-btn.active { background: #fff; color: #0a0a0a; }
+
+  /* =========================================================
+     PHOTOS VIEW
+     ========================================================= */
   #stage {
     position: fixed;
     inset: 0;
@@ -42,23 +77,17 @@
     transition: opacity 0.7s ease;
     pointer-events: none;
   }
-  .slide.active {
-    opacity: 1;
-  }
+  .slide.active { opacity: 1; }
 
-  /* subtle gradient so the nav bar stays legible over any photo */
   #scrim {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 0; right: 0; bottom: 0;
     height: 240px;
     background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0));
     pointer-events: none;
     z-index: 5;
   }
 
-  /* year label, top-left */
   #yearLabel {
     position: fixed;
     top: 28px;
@@ -75,12 +104,9 @@
     pointer-events: none;
   }
 
-  /* ---- Bottom nav ---- */
   #nav {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 0; right: 0; bottom: 0;
     height: var(--nav-height);
     z-index: 20;
     display: flex;
@@ -111,13 +137,8 @@
     white-space: nowrap;
   }
   .year-btn:hover { color: #fff; }
-  .year-btn.active {
-    color: #0a0a0a;
-    background: #fff;
-    text-shadow: none;
-  }
+  .year-btn.active { color: #0a0a0a; background: #fff; text-shadow: none; }
 
-  /* one-time hint on touch devices */
   #hint {
     position: fixed;
     left: 50%;
@@ -139,18 +160,248 @@
     transition: opacity 0.6s ease;
   }
   #hint.show { opacity: 1; }
+
+  /* =========================================================
+     VIDEOS VIEW
+     ========================================================= */
+  #videosView {
+    position: fixed;
+    inset: 0;
+    display: none;
+    overflow-y: auto;
+    background: #0a0a0a;
+    padding: 92px 22px 56px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .videos-inner { max-width: 1180px; margin: 0 auto; }
+
+  .group-title {
+    font-family: "Bebas Neue", sans-serif;
+    color: #fff;
+    font-size: 46px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin: 26px 0 4px;
+  }
+  .group-sub {
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    margin-bottom: 20px;
+  }
+
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 22px;
+    margin-bottom: 12px;
+  }
+
+  .vcard {
+    display: block;
+    text-align: left;
+    background: #161616;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .vcard:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.22); }
+
+  .vthumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000 center / cover no-repeat;
+  }
+  .vthumb::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0) 45%);
+  }
+  .vplay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    border: 2px solid rgba(255,255,255,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .vcard:hover .vplay { transform: translate(-50%, -50%) scale(1.08); background: rgba(0,0,0,0.7); }
+  .vplay::before {
+    content: "";
+    border-style: solid;
+    border-width: 9px 0 9px 15px;
+    border-color: transparent transparent transparent #fff;
+    margin-left: 4px;
+  }
+  .vdur {
+    position: absolute;
+    right: 8px; bottom: 8px;
+    z-index: 2;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    padding: 2px 7px;
+    border-radius: 5px;
+  }
+
+  .vmeta { padding: 13px 15px 16px; }
+  .vhead {
+    color: #fff;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+  .vyear {
+    margin-top: 7px;
+    color: rgba(255,255,255,0.4);
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.06em;
+  }
+
+  /* =========================================================
+     PLAYER OVERLAY
+     ========================================================= */
+  #player {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    background: rgba(0,0,0,0.97);
+  }
+  body.player-open #player { display: flex; }
+
+  #player .player-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    position: relative;
+    padding: 0 12px;
+  }
+  #playerVideo {
+    max-width: min(100%, 1400px);
+    max-height: 100%;
+    background: #000;
+    border-radius: 8px;
+  }
+
+  .player-caption {
+    padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
+    text-align: center;
+  }
+  .player-caption .ph {
+    color: #fff;
+    font-size: clamp(16px, 2.4vw, 22px);
+    font-weight: 600;
+  }
+  .player-caption .py {
+    margin-top: 5px;
+    color: rgba(255,255,255,0.45);
+    font-family: "Bebas Neue", sans-serif;
+    letter-spacing: 0.06em;
+    font-size: 18px;
+  }
+
+  .player-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 26px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease;
+    z-index: 3;
+  }
+  .player-btn:hover { background: rgba(255,255,255,0.25); }
+  #prevBtn { left: 16px; }
+  #nextBtn { right: 16px; }
+
+  #closeBtn {
+    position: absolute;
+    top: 18px; right: 20px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 4;
+    transition: background 0.2s ease;
+  }
+  #closeBtn:hover { background: rgba(255,255,255,0.25); }
+
+  @media (max-width: 600px) {
+    .player-btn { width: 44px; height: 44px; font-size: 22px; }
+    #prevBtn { left: 8px; } #nextBtn { right: 8px; }
+    .group-title { font-size: 38px; }
+  }
+
+  /* Mode switching */
+  body.mode-videos #stage,
+  body.mode-videos #scrim,
+  body.mode-videos #yearLabel,
+  body.mode-videos #hint,
+  body.mode-videos #nav { display: none; }
+  body.mode-videos #videosView { display: block; }
 </style>
 </head>
-<body>
+<body class="mode-photos">
+
+  <!-- Photos / Videos switch -->
+  <div id="modeToggle">
+    <button class="mode-btn active" data-mode="photos">Photos</button>
+    <button class="mode-btn" data-mode="videos">Videos</button>
+  </div>
+
+  <!-- ===== PHOTOS ===== -->
   <div id="stage"></div>
   <div id="scrim"></div>
   <div id="yearLabel"></div>
   <div id="hint">&#8592;&nbsp;&nbsp;swipe to see more&nbsp;&nbsp;&#8594;</div>
   <nav id="nav"></nav>
 
+  <!-- ===== VIDEOS ===== -->
+  <div id="videosView"><div class="videos-inner" id="videosInner"></div></div>
+
+  <!-- ===== PLAYER ===== -->
+  <div id="player">
+    <button id="closeBtn" aria-label="Close">&times;</button>
+    <div class="player-stage">
+      <button class="player-btn" id="prevBtn" aria-label="Previous">&#8249;</button>
+      <video id="playerVideo" controls playsinline preload="metadata"></video>
+      <button class="player-btn" id="nextBtn" aria-label="Next">&#8250;</button>
+    </div>
+    <div class="player-caption">
+      <div class="ph" id="playerHead"></div>
+      <div class="py" id="playerYear"></div>
+    </div>
+  </div>
+
 <script>
-  // Each entry: the year (label) and its photo file.
-  // Add a new reunion by dropping the photo in this folder and adding a line here.
+  /* =========================================================
+     PHOTOS DATA
+     ========================================================= */
   const PHOTOS = [
     { year: "2026", src: "2026.jpeg" },
     { year: "2025", src: "2025.jpeg" },
@@ -165,13 +416,56 @@
     { year: "2004", src: "2004.jpeg" },
   ];
 
+  /* =========================================================
+     VIDEOS DATA
+     Headlines are written from the video's visuals. Edit any
+     "headline" freely — that's the only text shown on the card.
+     Add a new video: drop its .mp4 in videos/ + poster in
+     videos/posters/, then add a line here.
+     ========================================================= */
+  const VIDEOS = [
+    // ---- 2026 · the camp reunion ----
+    { file: "IMG_8218", year: "2026", dur: 133, headline: "Standing up to share a story" },
+    { file: "IMG_4814", year: "2026", dur: 199, headline: "Kicking off the toasts in the mess hall" },
+    { file: "IMG_6643", year: "2026", dur: 56,  headline: "Taking the mic in patriotic flannel" },
+    { file: "IMG_6644", year: "2026", dur: 181, headline: "Stars, stripes, and a story to tell" },
+    { file: "IMG_6645", year: "2026", dur: 159, headline: "A turn at the mic between the milk dispensers" },
+    { file: "IMG_6646", year: "2026", dur: 71,  headline: "The floor goes to the man in the orange bandana" },
+    { file: "IMG_6647", year: "2026", dur: 170, headline: "A heartfelt story for the whole family" },
+    { file: "IMG_6648", year: "2026", dur: 109, headline: "Uncle Sam pants and plenty to say" },
+    { file: "IMG_6650", year: "2026", dur: 145, headline: "A story shared as the family dog wanders by" },
+    { file: "IMG_6651", year: "2026", dur: 179, headline: "Holding the room with a quiet tale" },
+    { file: "IMG_6652", year: "2026", dur: 81,  headline: "A toast that ends in a cheer" },
+    { file: "IMG_6653", year: "2026", dur: 89,  headline: "Back at the mic for one more" },
+    { file: "IMG_6654", year: "2026", dur: 195, headline: "An elder's story beneath the family crest" },
+    { file: "IMG_6655", year: "2026", dur: 124, headline: "Her turn to take the floor" },
+    { file: "IMG_6656", year: "2026", dur: 30,  headline: "A quick word before passing the mic" },
+    { file: "IMG_6657", year: "2026", dur: 79,  headline: "A story from the Lodge" },
+    { file: "IMG_6658", year: "2026", dur: 57,  headline: "The next generation takes the mic" },
+    { file: "IMG_6659", year: "2026", dur: 224, headline: "Bringing the laughs in an antler hat" },
+    { file: "IMG_6660", year: "2026", dur: 99,  headline: "Wrapping the night in red, white and blue" },
+    // ---- 2023 · the reunion dinner ----
+    { file: "IMG_1818", year: "2023", dur: 260, headline: "The tributes begin" },
+    { file: "IMG_1819", year: "2023", dur: 222, headline: "An animated tale that has everyone laughing" },
+    { file: "IMG_1820", year: "2023", dur: 316, headline: "A tender turn at the microphone" },
+    { file: "IMG_1821", year: "2023", dur: 155, headline: "Smiles and shared memories" },
+    { file: "IMG_1822", year: "2023", dur: 425, headline: "A ballcap and a big story" },
+    { file: "IMG_1823", year: "2023", dur: 464, headline: "“To those who came before us” — a heartfelt tribute" },
+    { file: "IMG_1824", year: "2023", dur: 61,  headline: "One more story before the night winds down" },
+  ];
+
+  const GROUPS = [
+    { year: "2026", sub: "Family stories & tributes · the camp reunion" },
+    { year: "2023", sub: "Family stories & tributes · the reunion dinner" },
+  ];
+
+  /* =========================================================
+     PHOTOS LOGIC
+     ========================================================= */
   const stage = document.getElementById("stage");
   const nav = document.getElementById("nav");
   const yearLabel = document.getElementById("yearLabel");
-
-  const slides = [];
-  const buttons = [];
-  const panX = [];   // remembered horizontal pan (%) per photo
+  const slides = [], buttons = [], panX = [];
 
   PHOTOS.forEach((p, i) => {
     const slide = document.createElement("div");
@@ -191,50 +485,39 @@
   });
 
   let current = -1;
-
   function show(i) {
     if (i === current) return;
     slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
     buttons.forEach((b, idx) => b.classList.toggle("active", idx === i));
     yearLabel.textContent = PHOTOS[i].year;
     current = i;
-    // keep the selected year comfortably in view within the scroller
     buttons[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }
 
-  // ---- Drag to pan the photo horizontally (reveals the cropped sides) ----
+  // Drag to pan wide photos
   let dragging = false, startX = 0, startPos = 50;
-
   stage.addEventListener("pointerdown", (e) => {
-    dragging = true;
-    startX = e.clientX;
-    startPos = panX[current];
+    dragging = true; startX = e.clientX; startPos = panX[current];
     stage.classList.add("dragging");
     stage.setPointerCapture(e.pointerId);
     dismissHint();
   });
-
   stage.addEventListener("pointermove", (e) => {
     if (!dragging) return;
-    // a full screen-width drag sweeps the whole photo, left to right
     const deltaPct = ((e.clientX - startX) / stage.clientWidth) * 100;
     const pos = Math.max(0, Math.min(100, startPos - deltaPct));
     panX[current] = pos;
     slides[current].style.backgroundPositionX = pos + "%";
   });
-
   function endDrag(e) {
     if (!dragging) return;
     dragging = false;
     stage.classList.remove("dragging");
-    if (e.pointerId != null && stage.hasPointerCapture(e.pointerId)) {
-      stage.releasePointerCapture(e.pointerId);
-    }
+    if (e.pointerId != null && stage.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId);
   }
   stage.addEventListener("pointerup", endDrag);
   stage.addEventListener("pointercancel", endDrag);
 
-  // ---- One-time swipe hint on touch devices ----
   const hint = document.getElementById("hint");
   let hintShown = false;
   function dismissHint() {
@@ -243,19 +526,114 @@
     hintShown = false;
   }
   if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
-    hint.classList.add("show");
-    hintShown = true;
+    hint.classList.add("show"); hintShown = true;
     setTimeout(dismissHint, 4500);
   }
+  show(0);
 
-  // Arrow keys to move between years
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") show(Math.min(current + 1, PHOTOS.length - 1));
-    if (e.key === "ArrowLeft")  show(Math.max(current - 1, 0));
+  /* =========================================================
+     VIDEOS LOGIC
+     ========================================================= */
+  const fmt = (s) => `${Math.floor(s/60)}:${String(Math.round(s)%60).padStart(2,"0")}`;
+  const posterPath = (v) => `videos/posters/${v.file}.jpg`;
+  const videoPath  = (v) => `videos/${v.file}.mp4`;
+
+  const inner = document.getElementById("videosInner");
+  GROUPS.forEach((g) => {
+    const items = VIDEOS.filter((v) => v.year === g.year);
+    if (!items.length) return;
+    const title = document.createElement("h2");
+    title.className = "group-title";
+    title.textContent = g.year;
+    const sub = document.createElement("div");
+    sub.className = "group-sub";
+    sub.textContent = g.sub;
+    const grid = document.createElement("div");
+    grid.className = "video-grid";
+
+    items.forEach((v) => {
+      const idx = VIDEOS.indexOf(v);
+      const card = document.createElement("button");
+      card.className = "vcard";
+      card.innerHTML =
+        `<div class="vthumb" style="background-image:url('${posterPath(v)}')">` +
+          `<div class="vplay"></div><div class="vdur">${fmt(v.dur)}</div>` +
+        `</div>` +
+        `<div class="vmeta"><div class="vhead">${v.headline}</div>` +
+        `<div class="vyear">${v.year}</div></div>`;
+      card.addEventListener("click", () => openPlayer(idx));
+      grid.appendChild(card);
+    });
+
+    inner.appendChild(title);
+    inner.appendChild(sub);
+    inner.appendChild(grid);
   });
 
-  // Start on the most recent reunion (now first in the list)
-  show(0);
+  // Player
+  const player = document.getElementById("player");
+  const pv = document.getElementById("playerVideo");
+  const pHead = document.getElementById("playerHead");
+  const pYear = document.getElementById("playerYear");
+  let pIndex = -1;
+
+  function openPlayer(i) {
+    pIndex = i;
+    const v = VIDEOS[i];
+    pv.poster = posterPath(v);
+    pv.src = videoPath(v);
+    pHead.textContent = v.headline;
+    pYear.textContent = v.year;
+    document.body.classList.add("player-open");
+    pv.currentTime = 0;
+    const p = pv.play();
+    if (p && p.catch) p.catch(() => {}); // ignore autoplay block; controls are visible
+  }
+  function closePlayer() {
+    pv.pause();
+    pv.removeAttribute("src");
+    pv.load();
+    document.body.classList.remove("player-open");
+    pIndex = -1;
+  }
+  function step(d) {
+    if (pIndex < 0) return;
+    openPlayer((pIndex + d + VIDEOS.length) % VIDEOS.length);
+  }
+
+  document.getElementById("closeBtn").addEventListener("click", closePlayer);
+  document.getElementById("prevBtn").addEventListener("click", () => step(-1));
+  document.getElementById("nextBtn").addEventListener("click", () => step(1));
+  pv.addEventListener("ended", () => step(1));
+  player.addEventListener("click", (e) => { if (e.target === player) closePlayer(); });
+
+  /* =========================================================
+     MODE TOGGLE
+     ========================================================= */
+  const modeBtns = document.querySelectorAll(".mode-btn");
+  function setMode(mode) {
+    document.body.classList.toggle("mode-videos", mode === "videos");
+    document.body.classList.toggle("mode-photos", mode === "photos");
+    modeBtns.forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
+    if (mode !== "videos" && document.body.classList.contains("player-open")) closePlayer();
+  }
+  modeBtns.forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+  /* =========================================================
+     KEYBOARD
+     ========================================================= */
+  document.addEventListener("keydown", (e) => {
+    if (document.body.classList.contains("player-open")) {
+      if (e.key === "Escape") closePlayer();
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+      return;
+    }
+    if (document.body.classList.contains("mode-photos")) {
+      if (e.key === "ArrowRight") show(Math.min(current + 1, PHOTOS.length - 1));
+      if (e.key === "ArrowLeft")  show(Math.max(current - 1, 0));
+    }
+  });
 </script>
 </body>
 </html>
